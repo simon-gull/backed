@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backed — Draft Your Team. Bet on Greatness.</title>
+<meta name="description" content="Fantasy Football for business leaders. Draft a team of the world's top entrepreneurs and compete based on real stock data, news sentiment, and community conviction.">
+<link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #080b12;
+    --surface: #111827;
+    --surface-2: #1c2440;
+    --text: #f2f0ec;
+    --text-secondary: #cbd5e1;
+    --text-label: #94a3b8;
+    --accent: #4ade80;
+    --accent-dim: rgba(74,222,128,0.12);
+    --token-gold: #fbbf24;
+    --red: #f87171;
+    --font-display: 'Play', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 15% 50%, rgba(74,222,128,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, rgba(59,130,246,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 85%, rgba(139,92,246,0.04) 0%, transparent 50%),
+      linear-gradient(180deg, #080b12 0%, #0d1424 30%, #111d35 55%, #0e1628 80%, #080b12 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.6;
+    text-wrap: pretty;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === NAV === */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: clamp(0.8rem,1.5vw,1.1rem) clamp(1.5rem,4vw,3rem);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    border-bottom: 1px solid transparent;
+    transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.1rem,1.8vw,1.4rem);
+    letter-spacing: 0.08em;
+    color: var(--text);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: clamp(0.8rem,2vw,1.8rem); list-style: none; }
+  .nav-links a {
+    color: var(--text-label);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 0;
+    width: 0; height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--accent); }
+  .nav-links a.active::after { width: 100%; }
+
+  /* === PAGES === */
+  .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .page.active { display: block; }
+  .page-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(6rem,10vh,8rem) clamp(1.5rem,4vw,3rem);
+  }
+  .container { max-width: 1100px; width: 100%; margin: 0 auto; }
+
+  /* === HERO === */
+  .hero-content { max-width: 780px; }
+  .hero-label {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: clamp(1.5rem,3vh,2.5rem);
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.4,0,0.2,1) 0.2s forwards;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem,6vw,5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: clamp(1.5rem,3vh,2rem);
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.4,0,0.2,1) 0.4s forwards;
+  }
+  .hero-title em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    font-size: clamp(1rem,1.4vw,1.2rem);
+    color: var(--text);
+    max-width: 540px;
+    line-height: 1.75;
+    margin-bottom: clamp(2rem,4vh,3rem);
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.4,0,0.2,1) 0.6s forwards;
+  }
+  .cta-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.4,0,0.2,1) 0.8s forwards;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 2rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    text-decoration: none;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(74,222,128,0.3); }
+  .btn-primary svg { width: 18px; height: 18px; transition: transform 0.3s ease; }
+  .btn-primary:hover svg { transform: translateX(3px); }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.85rem 1.8rem;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.6); transform: translateY(-2px); }
+
+  /* === SECTION BASICS === */
+  .section-label {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem,3.5vw,2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text);
+  }
+
+  /* === HOW IT WORKS === */
+  .hiw-flow { padding-top: clamp(6rem,10vh,8rem); }
+  .hiw-section { padding: clamp(3rem,6vh,5rem) clamp(1.5rem,4vw,3rem); }
+  .hiw-section + .hiw-section { border-top: 1px solid rgba(255,255,255,0.04); }
+  .hiw-block { max-width: 650px; }
+  .hiw-text { color: var(--text-secondary); font-size: clamp(0.95rem,1.2vw,1.05rem); line-height: 1.75; margin-top: 1rem; }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: clamp(1.5rem,3vw,2.5rem);
+  }
+  .about-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: clamp(1.5rem,3vw,2.5rem);
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .about-card:hover { border-color: rgba(74,222,128,0.15); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .card-number { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.8rem; line-height: 1; }
+  .card-title { font-family: var(--font-display); font-size: clamp(1.1rem,1.5vw,1.3rem); font-weight: 700; margin-bottom: 0.6rem; color: var(--text); }
+  .card-text { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.65; }
+
+  .scoring-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1rem,2vw,1.5rem); }
+  .scoring-factor { background: var(--surface); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: clamp(1.2rem,2vw,2rem); }
+  .scoring-pct { font-family: var(--font-display); font-size: clamp(1.6rem,2.5vw,2.2rem); font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+  .scoring-name { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 0.4rem; }
+  .scoring-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; }
+
+  .who-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem,3vw,2.5rem); }
+  .who-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: clamp(1.5rem,3vw,2.5rem); }
+  .who-title { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.1rem,1.5vw,1.3rem); color: var(--accent); margin-bottom: 0.6rem; }
+  .who-text { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.65; }
+
+  /* === PEOPLE PAGE === */
+  .people-page { display: flex; height: 100vh; padding-top: 54px; }
+
+  .roster {
+    width: 260px;
+    flex-shrink: 0;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    overflow-y: auto;
+    padding: 0.8rem 0;
+    background: rgba(8,11,18,0.8);
+  }
+  .roster-search {
+    padding: 0 1rem 0.6rem;
+  }
+  .roster-search input {
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  .roster-search input:focus { border-color: var(--accent); }
+  .roster-search input::placeholder { color: var(--text-label); }
+  .roster-title {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    padding: 0.4rem 1.2rem;
+    margin-top: 0.4rem;
+  }
+  .roster-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+  .roster-item:hover { background: rgba(255,255,255,0.04); }
+  .roster-item.active { background: rgba(74,222,128,0.08); border-left-color: var(--accent); }
+  .roster-name { font-family: var(--font-display); font-size: 0.85rem; font-weight: 700; color: var(--text); }
+  .roster-item.active .roster-name { color: var(--accent); }
+  .roster-tag { font-size: 0.7rem; color: var(--text-label); margin-top: 0.05rem; }
+  .roster-item.active .roster-tag { color: var(--text-secondary); }
+  .roster-count {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-label);
+    padding: 0.6rem 1.2rem 0.2rem;
+  }
+
+  /* Stage */
+  .stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(74,222,128,0.04) 0%, transparent 40%),
+      linear-gradient(180deg, rgba(15,20,35,0.8) 0%, rgba(10,14,24,0.95) 100%);
+  }
+  .stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.015) 0%, transparent 40%),
+      linear-gradient(0deg, rgba(74,222,128,0.03) 0%, transparent 20%);
+    pointer-events: none;
+  }
+
+  .floor-patch {
+    position: absolute;
+    bottom: -4%;
+    left: 50%;
+    transform: translateX(-45%);
+    width: 320px;
+    height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .floor-patch::before {
+    content: '';
+    position: absolute;
+    top: 25%; left: 20%; width: 60%; height: 50%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(74,222,128,0.12) 0%, transparent 70%);
+    filter: blur(10px);
+  }
+
+  .stage-inner {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: clamp(1.5rem,3vw,3.5rem);
+    align-items: center;
+    max-width: 880px;
+    width: 100%;
+    padding: 0 clamp(1.5rem,3vw,3rem);
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Navigation arrows */
+  .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  .nav-arrow:hover { background: rgba(74,222,128,0.15); border-color: var(--accent); color: var(--accent); }
+  .nav-arrow svg { width: 20px; height: 20px; }
+  .nav-arrow-left { left: 16px; }
+  .nav-arrow-right { right: 16px; }
+
+  /* Character visual with CSS effects */
+  .character-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 2;
+    min-height: 400px;
+  }
+  .character-img-wrapper {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.15s ease-out;
+    transform-style: preserve-3d;
+    width: clamp(220px, 28vw, 320px);
+    height: clamp(330px, 50vh, 480px);
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .character-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    filter: contrast(1.3) saturate(0.6) brightness(1.05);
+  }
+  /* Rim light overlay */
+  .character-img-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(74, 222, 128, 0.1) 0%, transparent 30%),
+      linear-gradient(270deg, rgba(59, 130, 246, 0.07) 0%, transparent 30%),
+      linear-gradient(0deg, rgba(74, 222, 128, 0.12) 0%, transparent 25%);
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: screen;
+  }
+  /* Scan lines */
+  .character-img-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0, 0, 0, 0.06) 2px, rgba(0, 0, 0, 0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* Character panel */
+  .character-panel {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem,1vh,0.9rem);
+  }
+  .char-role {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .char-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem,2.5vw,2.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .char-bio {
+    font-size: clamp(0.85rem,1vw,0.95rem);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 400px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 1.2rem;
+    padding: 0.6rem 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .info-item { display: flex; flex-direction: column; gap: 0.05rem; }
+  .info-label {
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-label);
+  }
+  .info-value { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+
+  .stock-ticker-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: rgba(74,222,128,0.08);
+    padding: 0.35rem 0.8rem;
+    border-radius: 8px;
+    color: var(--accent);
+    width: fit-content;
+  }
+  .stock-ticker-display.negative {
+    background: rgba(248,113,113,0.08);
+    color: var(--red);
+  }
+
+  .char-backing { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .backing-number { display: flex; flex-direction: column; }
+  .backing-count { font-family: var(--font-display); font-size: clamp(1.3rem,2vw,1.7rem); font-weight: 700; color: var(--accent); line-height: 1; }
+  .backing-label { font-size: 0.65rem; color: var(--text-label); font-weight: 500; margin-top: 0.2rem; }
+  .trend-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 20px;
+    padding: 0.25rem 0.7rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+  .trend-badge.negative {
+    background: rgba(248,113,113,0.1);
+    border-color: rgba(248,113,113,0.2);
+    color: var(--red);
+  }
+
+  .btn-draft {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 2rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    width: fit-content;
+  }
+  .btn-draft:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(74,222,128,0.3); }
+
+  /* === DRAFT PAGE === */
+  .draft-page {
+    padding: clamp(5rem,10vh,7rem) clamp(1.5rem,4vw,3rem) clamp(3rem,6vh,5rem);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .draft-header { margin-bottom: clamp(1.5rem,3vh,2rem); }
+  .draft-sub { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; max-width: 550px; margin-top: 0.5rem; }
+
+  .draft-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: clamp(1.5rem,3vh,2rem);
+    flex-wrap: wrap;
+  }
+  .draft-stat {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+  }
+  .draft-stat-value { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; line-height: 1; }
+  .draft-stat-value.gold { color: var(--token-gold); }
+  .draft-stat-value.green { color: var(--accent); }
+  .draft-stat-label { font-size: 0.68rem; color: var(--text-label); margin-top: 0.25rem; }
+
+  .draft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  .draft-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .draft-card:hover { border-color: rgba(74,222,128,0.2); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+  .draft-card.selected { border-color: var(--accent); background: rgba(74,222,128,0.06); }
+  .draft-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px; right: 10px;
+    font-size: 0.9rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .draft-card-img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 10px;
+    filter: contrast(1.2) saturate(0.6) brightness(1.05);
+    margin-bottom: 0.6rem;
+  }
+  .draft-card-name { font-family: var(--font-display); font-weight: 700; font-size: 0.85rem; color: var(--text); }
+  .draft-card-company { font-size: 0.72rem; color: var(--text-label); margin-top: 0.1rem; }
+  .draft-card-score {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .draft-card-score-value { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--accent); }
+  .draft-card-sector { font-size: 0.65rem; color: var(--text-label); }
+
+  /* Your Team panel */
+  .draft-team {
+    margin-top: clamp(2rem,4vh,3rem);
+    background: var(--surface);
+    border: 1px solid rgba(74,222,128,0.12);
+    border-radius: 16px;
+    padding: clamp(1.2rem,2vw,2rem);
+  }
+  .draft-team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .draft-team-title { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--accent); }
+  .draft-team-score { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: var(--text); }
+  .draft-team-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .draft-team-empty { color: var(--text-label); font-size: 0.85rem; font-style: italic; }
+  .draft-team-member {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .draft-team-member:last-child { border-bottom: none; }
+  .draft-team-member-left { display: flex; align-items: center; gap: 0.8rem; }
+  .draft-team-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: contrast(1.2) saturate(0.5);
+  }
+  .draft-team-member-name { font-family: var(--font-display); font-weight: 700; font-size: 0.82rem; color: var(--text); }
+  .draft-team-remove {
+    background: none; border: none; color: var(--red); cursor: pointer;
+    font-size: 0.75rem; font-family: var(--font-display); font-weight: 700;
+    opacity: 0.6; transition: opacity 0.2s;
+  }
+  .draft-team-remove:hover { opacity: 1; }
+
+  /* === LEADERBOARD === */
+  .leaderboard-page {
+    padding: clamp(5rem,10vh,7rem) clamp(1.5rem,4vw,3rem) clamp(3rem,6vh,5rem);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .leaderboard-header { margin-bottom: clamp(2rem,4vh,3rem); }
+  .leaderboard-sub { color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem; }
+  .leaderboard-section { margin-bottom: clamp(2rem,4vh,3rem); }
+  .leaderboard-section-title {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+  .leaderboard-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  .leaderboard-row:hover { border-color: rgba(74,222,128,0.15); transform: translateX(4px); }
+  .leaderboard-row-left { display: flex; align-items: center; gap: 1rem; }
+  .leaderboard-rank {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent);
+    width: 28px;
+    text-align: center;
+  }
+  .leaderboard-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: contrast(1.2) saturate(0.5);
+  }
+  .leaderboard-name { font-family: var(--font-display); font-weight: 700; font-size: 0.88rem; color: var(--text); }
+  .leaderboard-company { font-size: 0.72rem; color: var(--text-label); }
+  .leaderboard-score { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--accent); }
+
+  /* === MATCH / FIGHT PAGE === */
+  .match-page {
+    padding: clamp(5rem,10vh,7rem) clamp(1.5rem,4vw,3rem) clamp(3rem,6vh,5rem);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .match-header { margin-bottom: clamp(1.5rem,3vh,2rem); text-align: center; }
+  .match-vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .match-team-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1rem,2vw,1.4rem);
+    color: var(--text);
+  }
+  .match-team-score-big {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem,4vw,3rem);
+    line-height: 1;
+  }
+  .match-team-score-big.green { color: var(--accent); }
+  .match-team-score-big.red { color: var(--red); }
+  .match-vs-label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--text-label);
+    letter-spacing: 0.1em;
+  }
+  .match-status {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .match-status.live { color: var(--accent); background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); }
+
+  /* Individual matchups */
+  .matchup {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    transition: all 0.3s ease;
+  }
+  .matchup:hover { border-color: rgba(255,255,255,0.12); }
+  .matchup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+  }
+  .matchup-player {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1;
+  }
+  .matchup-player.right { flex-direction: row-reverse; text-align: right; }
+  .matchup-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: contrast(1.2) saturate(0.5);
+  }
+  .matchup-name { font-family: var(--font-display); font-weight: 700; font-size: 0.82rem; color: var(--text); }
+  .matchup-company { font-size: 0.68rem; color: var(--text-label); }
+  .matchup-vs {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: var(--text-label);
+    letter-spacing: 0.1em;
+    padding: 0 0.8rem;
+    flex-shrink: 0;
+  }
+
+  /* Momentum bar */
+  .momentum-bar-container {
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 0.5rem;
+  }
+  .momentum-bar-left {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), rgba(74,222,128,0.6));
+    border-radius: 4px 0 0 4px;
+    transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .momentum-bar-right {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(59,130,246,0.6), #3b82f6);
+    border-radius: 0 4px 4px 0;
+    transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .matchup-scores {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+  .matchup-score-left { color: var(--accent); }
+  .matchup-score-right { color: #3b82f6; }
+
+  /* Event feed */
+  .matchup-events {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .matchup-event {
+    font-size: 0.7rem;
+    color: var(--text-label);
+    padding: 0.2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .matchup-event-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .matchup-event-dot.positive { background: var(--accent); }
+  .matchup-event-dot.negative { background: var(--red); }
+  .matchup-event-dot.neutral { background: var(--text-label); }
+
+  .match-total {
+    background: var(--surface);
+    border: 1px solid rgba(74,222,128,0.15);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  .match-result {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+  .match-result.loss { color: var(--red); }
+
+  /* === AUTH MODAL === */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: clamp(1.5rem,4vw,2.5rem);
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: none; border: none;
+    color: var(--text-label); font-size: 1.2rem;
+    cursor: pointer;
+  }
+  .modal-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+  .modal-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.2rem; }
+  .modal-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(74,222,128,0.3); }
+  .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .modal-error { color: var(--red); font-size: 0.8rem; margin-top: 0.5rem; }
+  .modal-success { text-align: center; }
+  .modal-success-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+
+  /* Auth nav button */
+  .nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .nav-user {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .nav-signout {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-label);
+    cursor: pointer;
+    background: none;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: color 0.3s;
+  }
+  .nav-signout:hover { color: var(--text); }
+  .btn-signin {
+    padding: 0.5rem 1.2rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-signin:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(74,222,128,0.3); }
+
+  /* === LEAGUES === */
+  .leagues-page {
+    padding: clamp(5rem,10vh,7rem) clamp(1.5rem,4vw,3rem) clamp(3rem,6vh,5rem);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .leagues-header { margin-bottom: clamp(1.5rem,3vh,2rem); }
+  .leagues-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: clamp(1.5rem,3vh,2rem);
+    flex-wrap: wrap;
+  }
+  .league-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin-bottom: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .league-card:hover { border-color: rgba(74,222,128,0.2); transform: translateY(-2px); }
+  .league-card-name { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--text); }
+  .league-card-meta { font-size: 0.78rem; color: var(--text-label); margin-top: 0.2rem; }
+  .league-card-invite {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    background: rgba(74,222,128,0.08);
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  .league-card-invite:hover { background: rgba(74,222,128,0.15); }
+  .leagues-empty { color: var(--text-label); font-size: 0.9rem; font-style: italic; }
+  .join-row {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .join-input {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  .join-input:focus { border-color: var(--accent); }
+  .join-input::placeholder { color: var(--text-label); text-transform: none; letter-spacing: 0; font-weight: 400; }
+  .join-btn {
+    padding: 0.6rem 1.5rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .join-btn:hover { transform: translateY(-1px); }
+
+  /* Token slider in team */
+  .token-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .token-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+  }
+  .token-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .token-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--token-gold);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  /* === LIVE EVENTS TICKER === */
+  .live-events {
+    margin-top: clamp(2.5rem,5vh,4rem);
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.4,0,0.2,1) 1s forwards;
+  }
+  .live-events-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: livePulse 2s ease-in-out infinite;
+  }
+  @keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .live-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .live-event {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+  }
+  .live-event:hover { background: rgba(255,255,255,0.06); }
+  .live-event.positive { border-left-color: var(--accent); }
+  .live-event.negative { border-left-color: var(--red); }
+  .live-event-score {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    min-width: 40px;
+  }
+  .live-event-score.up { color: var(--accent); }
+  .live-event-score.down { color: var(--red); }
+  .live-event-name { font-weight: 600; color: var(--text); }
+
+  /* === CONTRARIAN CALLOUT === */
+  .contrarian-callout {
+    margin-top: clamp(2rem,4vh,3rem);
+    padding: 1.2rem 1.5rem;
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.15);
+    border-radius: 14px;
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.4,0,0.2,1) 1.2s forwards;
+  }
+  .contrarian-text {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .contrarian-text strong { color: var(--token-gold); }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes panelIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes charIn { from { opacity: 0; transform: scale(0.92) translateY(15px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal.delay-1 { transition-delay: 0.15s; }
+  .reveal.delay-2 { transition-delay: 0.3s; }
+  .reveal.delay-3 { transition-delay: 0.45s; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .scoring-grid { grid-template-columns: 1fr; }
+    .who-grid { grid-template-columns: 1fr; }
+    .people-page { flex-direction: column; }
+    .roster {
+      width: 100%; height: auto; max-height: 140px;
+      border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; flex-wrap: nowrap; overflow-x: auto; padding: 0.6rem;
+    }
+    .roster-title, .roster-search, .roster-count { display: none; }
+    .roster-item { flex-shrink: 0; padding: 0.4rem 0.8rem; border-left: none; border-bottom: 3px solid transparent; }
+    .roster-item.active { border-bottom-color: var(--accent); border-left-color: transparent; }
+    .stage-inner { grid-template-columns: 1fr; text-align: center; }
+    .character-visual { order: -1; }
+    .character-panel { align-items: center; }
+    .nav-arrow { display: none; }
+    .draft-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  }
+  @media (max-width: 600px) {
+    .nav-links { gap: 0.5rem; }
+    .nav-links a { font-size: 0.68rem; }
+    .draft-stats { gap: 0.8rem; }
+    .draft-stat { min-width: 90px; padding: 0.6rem 0.8rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" data-page="home">BACKED<span>.</span></div>
+  <ul class="nav-links">
+    <li><a data-page="home" class="active">Home</a></li>
+    <li><a data-page="about">How It Works</a></li>
+    <li><a data-page="people">Roster</a></li>
+    <li><a data-page="draft" data-auth="true">My Team</a></li>
+    <li><a data-page="leagues" data-auth="true">Leagues</a></li>
+    <li><a data-page="match" data-auth="true">Fight</a></li>
+    <li><a data-page="leaderboard">Leaderboard</a></li>
+  </ul>
+  <div class="nav-auth" id="navAuth">
+    <button class="btn-signin" onclick="openAuthModal()">Sign In</button>
+  </div>
+</nav>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal" style="max-width:380px;">
+    <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+
+    <!-- Tab switcher -->
+    <div id="authTabs" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);">
+      <button class="auth-tab active" onclick="switchAuthTab('login')" id="tabLogin" style="flex:1;padding:0.7rem 0;background:none;border:none;font-family:var(--font-display);font-weight:700;font-size:0.85rem;color:var(--accent);border-bottom:2px solid var(--accent);cursor:pointer;letter-spacing:0.04em;">Log In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')" id="tabSignup" style="flex:1;padding:0.7rem 0;background:none;border:none;font-family:var(--font-display);font-weight:700;font-size:0.85rem;color:var(--text-label);border-bottom:2px solid transparent;cursor:pointer;letter-spacing:0.04em;">Sign Up</button>
+    </div>
+
+    <!-- Login form -->
+    <div id="authLogin">
+      <input type="email" class="modal-input" id="loginEmail" placeholder="Email" autocomplete="email">
+      <input type="password" class="modal-input" id="loginPassword" placeholder="Password" autocomplete="current-password">
+      <button class="modal-btn" id="loginSubmit" onclick="handleLogin()">Log In</button>
+      <div class="modal-error" id="loginError"></div>
+    </div>
+
+    <!-- Signup form -->
+    <div id="authSignup" style="display:none;">
+      <input type="text" class="modal-input" id="signupUsername" placeholder="Username" autocomplete="username" maxlength="20">
+      <input type="email" class="modal-input" id="signupEmail" placeholder="Email" autocomplete="email">
+      <input type="password" class="modal-input" id="signupPassword" placeholder="Password (min 6 characters)" autocomplete="new-password">
+      <button class="modal-btn" onclick="handleSignup()">Create Account</button>
+      <div class="modal-error" id="signupError"></div>
+    </div>
+
+    <!-- Success state -->
+    <div id="authSuccess" style="display:none">
+      <div class="modal-success">
+        <span class="modal-success-icon">&#9989;</span>
+        <h3 class="modal-title">You're in</h3>
+        <p class="modal-text">Welcome to Backed. Time to build your&nbsp;team.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create League Modal -->
+<div class="modal-overlay" id="createLeagueModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('createLeagueModal')">&times;</button>
+    <h3 class="modal-title">Create a League</h3>
+    <p class="modal-text">Name your league. Invite friends with the&nbsp;code.</p>
+    <input type="text" class="modal-input" id="leagueName" placeholder="The Disruptors">
+    <button class="modal-btn" onclick="handleCreateLeague()">Create league</button>
+    <div class="modal-error" id="createLeagueError"></div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="page-section">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-label">Think you know who's winning? Prove&nbsp;it.</div>
+        <h1 class="hero-title">Your entrepreneurs<br>vs <em>theirs</em>.</h1>
+        <p class="hero-sub">Pick a team of real business leaders like Jensen Huang, Lisa Su, or Daniel Ek. Every week, your team fights someone else's and the winner is decided by what actually happens: stock prices move, news breaks, the world reacts. You watch it unfold and see exactly why you're winning or&nbsp;losing.</p>
+        <div class="cta-row">
+          <a class="btn-primary" data-page="people">
+            Draft your team
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a class="btn-secondary" data-page="about">How it works</a>
+        </div>
+
+        <!-- Live events -->
+        <div class="live-events" id="heroEvents">
+          <div class="live-events-label"><span class="live-dot"></span> This week in Backed</div>
+          <div class="live-events-list" id="heroEventsList"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="page" id="page-about">
+  <div class="hiw-flow">
+
+    <section class="hiw-section">
+      <div class="container">
+        <div class="hiw-block reveal">
+          <div class="section-label">What is Backed?</div>
+          <h2 class="section-title">A game where real business news decides who&nbsp;wins.</h2>
+          <p class="hiw-text">You build a team of real entrepreneurs and CEOs. Every week, your team is matched against another player's team. The score is based entirely on what happens in the real world that week: if Tesla's stock drops 5%, Elon Musk loses power. If Spotify announces record growth, Daniel Ek surges. At the end of the week, the team with more power wins, and you earn tokens you can use to make your team even&nbsp;stronger.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="hiw-section">
+      <div class="container">
+        <div class="hiw-block reveal">
+          <div class="section-label">How to play</div>
+          <h2 class="section-title" style="font-size:clamp(1.5rem,3vw,2.2rem)">Four steps.</h2>
+        </div>
+        <div class="about-grid" style="margin-top:2rem; grid-template-columns: 1fr 1fr;">
+          <div class="about-card reveal delay-1">
+            <div class="card-number">01</div>
+            <h3 class="card-title">Scout the roster</h3>
+            <p class="card-text">Browse real business leaders. Each one has a live power score based on their stock price, what's being written about them in the news, and how other players are betting on&nbsp;them.</p>
+          </div>
+          <div class="about-card reveal delay-2">
+            <div class="card-number">02</div>
+            <h3 class="card-title">Draft your team</h3>
+            <p class="card-text">You have 100 tokens. Pick 5 people and decide how many of your 100 tokens to put behind each one. Put 40 tokens on Jensen Huang? His performance counts for 40% of your team's&nbsp;score.</p>
+          </div>
+          <div class="about-card reveal delay-1">
+            <div class="card-number">03</div>
+            <h3 class="card-title">Watch them fight</h3>
+            <p class="card-text">Every Monday, you're matched against an opponent. During the week, real events shift the score: earnings reports, product launches, viral headlines, scandals. You see exactly what's happening and&nbsp;why.</p>
+          </div>
+          <div class="about-card reveal delay-2">
+            <div class="card-number">04</div>
+            <h3 class="card-title">Win and grow</h3>
+            <p class="card-text">Win a match and earn 5 bonus tokens. Beat someone ranked above you and earn 7. The more you win, the stronger your team gets and the higher you climb, from Bronze all the way to&nbsp;Legend.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hiw-section">
+      <div class="container">
+        <div class="hiw-block reveal">
+          <div class="section-label">How scores work</div>
+          <h2 class="section-title" style="font-size:clamp(1.5rem,3vw,2.2rem)">Every score has a&nbsp;reason.</h2>
+          <p class="hiw-text">There's no luck and no hidden algorithm. Each player's weekly power comes from three things you can verify yourself. After every match, you see exactly which events moved the score and&nbsp;why.</p>
+        </div>
+        <div class="scoring-grid reveal" style="margin-top:2rem;">
+          <div class="scoring-factor">
+            <div class="scoring-pct">40%</div>
+            <div class="scoring-name">Stock price</div>
+            <p class="scoring-desc">How their company's stock moved this week compared to everyone else on the roster. If NVIDIA went up 8% and that's in the top 10% of all players, Jensen Huang scores&nbsp;high.</p>
+          </div>
+          <div class="scoring-factor">
+            <div class="scoring-pct">40%</div>
+            <div class="scoring-name">News momentum</div>
+            <p class="scoring-desc">Not just how much is written, but whether it changed. If someone suddenly gets a wave of negative press they don't normally get, their score&nbsp;drops.</p>
+          </div>
+          <div class="scoring-factor">
+            <div class="scoring-pct">20%</div>
+            <div class="scoring-name">Community bets</div>
+            <p class="scoring-desc">How other players are betting. Here's the twist: the more popular a pick, the less they're worth. Everyone drafts Jensen Huang? His impact drops. Find someone nobody else sees, and you score&nbsp;big.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hiw-section">
+      <div class="container">
+        <div class="hiw-block reveal">
+          <div class="section-label">Competition</div>
+          <h2 class="section-title" style="font-size:clamp(1.5rem,3vw,2.2rem)">Play with friends or against the&nbsp;world.</h2>
+          <p class="hiw-text">Matches run every week, Monday to Sunday. You can follow the score all week as real events happen. On Sunday night, the match is settled and you see the full&nbsp;breakdown.</p>
+        </div>
+        <div class="who-grid reveal" style="margin-top:2rem;">
+          <div class="who-card">
+            <h3 class="who-title">Private leagues</h3>
+            <p class="who-text">Create a league and invite your friends with a code. Everyone builds a team, everyone gets matched up each week, and there's a league table showing who's on top. This is where the trash talk&nbsp;lives.</p>
+          </div>
+          <div class="who-card">
+            <h3 class="who-title">Global ranking</h3>
+            <p class="who-text">Every player has an ELO rating that goes up when you win and down when you lose, just like in chess. Beat someone ranked higher than you and you climb fast. There are five ranks: Bronze, Silver, Gold, Diamond, and&nbsp;Legend.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- PEOPLE / ROSTER -->
+<div class="page" id="page-people">
+  <div class="people-page">
+    <div class="roster" id="rosterList">
+      <div class="roster-search"><input type="text" id="rosterSearch" placeholder="Search roster..."></div>
+      <div class="roster-count" id="rosterCount"></div>
+      <div class="roster-title">Roster</div>
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="stage">
+      <div class="nav-arrow nav-arrow-left" id="prevChar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <div class="nav-arrow nav-arrow-right" id="nextChar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="stage-inner">
+        <div class="character-visual" id="charVisual">
+          <div class="floor-patch"></div>
+          <div class="character-img-wrapper" id="charWrapper">
+            <img id="charImg" src="" alt="">
+          </div>
+        </div>
+        <div class="character-panel" id="charPanel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAFT -->
+<div class="page" id="page-draft">
+  <div class="draft-page">
+    <div class="draft-header">
+      <div class="section-label">Season 1 · Q2 2026</div>
+      <h2 class="section-title">My&nbsp;Team</h2>
+      <p class="draft-sub">5 fighters. 100 tokens. Your&nbsp;call.</p>
+    </div>
+    <div class="draft-stats" id="draftStats">
+      <div class="draft-stat"><div class="draft-stat-value gold" id="tokensLeft">100</div><div class="draft-stat-label">Tokens left</div></div>
+      <div class="draft-stat"><div class="draft-stat-value" id="teamCount" style="color:var(--text)">0 / 5</div><div class="draft-stat-label">Drafted</div></div>
+      <div class="draft-stat"><div class="draft-stat-value green" id="teamScore">0</div><div class="draft-stat-label">Team score</div></div>
+    </div>
+    <div class="draft-team" id="draftTeam">
+      <div class="draft-team-header">
+        <div class="draft-team-title">Your Fighters</div>
+        <div class="draft-team-score" id="draftTeamScore"></div>
+      </div>
+      <div class="draft-team-list" id="draftTeamList">
+        <div class="draft-team-empty">No one drafted yet. Browse the roster to add&nbsp;players.</div>
+      </div>
+    </div>
+    <div style="margin-top:clamp(2rem,4vh,3rem);">
+      <div class="section-label" style="margin-bottom:1rem;">Add Players</div>
+      <div class="draft-grid" id="draftGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LEAGUES -->
+<div class="page" id="page-leagues">
+  <div class="leagues-page">
+    <div class="leagues-header">
+      <div class="section-label">Season 1 · Q2 2026</div>
+      <h2 class="section-title">Your Leagues</h2>
+    </div>
+    <div class="join-row">
+      <input type="text" class="join-input" id="joinCode" placeholder="Enter invite code" maxlength="6">
+      <button class="join-btn" onclick="handleJoinLeague()">Join</button>
+    </div>
+    <div class="leagues-actions">
+      <button class="btn-primary" onclick="openModal('createLeagueModal')" style="font-size:0.8rem;padding:0.65rem 1.5rem;">Create League</button>
+    </div>
+    <div id="leaguesList">
+      <div class="leagues-empty">No leagues yet. Create one or join with a&nbsp;code.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MATCH / FIGHT -->
+<div class="page" id="page-match">
+  <div class="match-page">
+    <div class="match-header">
+      <div class="match-status live">Week 1 · Live</div>
+      <h2 class="section-title">Weekly Fight</h2>
+    </div>
+    <div class="match-vs" id="matchVs">
+      <!-- Filled by JS -->
+    </div>
+    <div id="matchMatchups">
+      <!-- Individual fighter matchups filled by JS -->
+    </div>
+    <div class="match-total" id="matchTotal">
+      <!-- Result summary -->
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="page" id="page-leaderboard">
+  <div class="leaderboard-page">
+    <div class="leaderboard-header">
+      <div class="section-label">Season 1 · Q2 2026</div>
+      <h2 class="section-title">Leaderboard</h2>
+      <p class="leaderboard-sub">Most drafted. Highest scores. The crowd has&nbsp;spoken.</p>
+    </div>
+    <div class="leaderboard-section">
+      <div class="leaderboard-section-title">Most Drafted</div>
+      <div id="leaderboardDrafted"></div>
+    </div>
+    <div class="leaderboard-section">
+      <div class="leaderboard-section-title">Highest Backed Score</div>
+      <div id="leaderboardScore"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ============================================================
+  // SUPABASE CONFIG
+  // ============================================================
+  const SUPABASE_URL = 'https://wdhosfmyzlihiixwgnom.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_iMGHcmLRC2DXI3r-ozLR0A_y9jafw1o';
+  let sb = null;
+  try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) { console.warn('Supabase not configured yet'); }
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  const ROSTER_RAW = [
+    { id:"elon-musk", name:"Elon Musk", role:"CEO & Founder", company:"Tesla / SpaceX", ticker:"TSLA", sector:"EV / Space / AI", location:"Austin, TX", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$195B", bio:"Runs Tesla, SpaceX, xAI, and X. The most polarizing entrepreneur alive.", photo:"photos/elon-musk.jpg", founded:2003 },
+    { id:"jensen-huang", name:"Jensen Huang", role:"CEO & Founder", company:"NVIDIA", ticker:"NVDA", sector:"AI / Semiconductors", location:"Santa Clara, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$124B", bio:"Built NVIDIA from a graphics card company into the engine behind the AI revolution.", photo:"photos/jensen-huang.jpg", founded:1993 },
+    { id:"mark-zuckerberg", name:"Mark Zuckerberg", role:"CEO & Founder", company:"Meta", ticker:"META", sector:"Social / AI / VR", location:"Menlo Park, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$186B", bio:"Built Facebook into Meta. Betting everything on AI and the metaverse.", photo:"photos/mark-zuckerberg.jpg", founded:2004 },
+    { id:"sam-altman", name:"Sam Altman", role:"CEO", company:"OpenAI", ticker:null, sector:"AI", location:"San Francisco, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$1B", bio:"Leading the race to build artificial general intelligence. The face of the AI era.", photo:"photos/sam-altman.jpg", founded:2015 },
+    { id:"tim-cook", name:"Tim Cook", role:"CEO", company:"Apple", ticker:"AAPL", sector:"Consumer Tech", location:"Cupertino, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$2.2B", bio:"Took Apple from $400B to $3T. The world\u2019s most valuable company, run by an operator.", photo:"photos/tim-cook.jpg", founded:1976 },
+    { id:"satya-nadella", name:"Satya Nadella", role:"CEO", company:"Microsoft", ticker:"MSFT", sector:"Cloud / AI", location:"Redmond, WA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$1.1B", bio:"Turned Microsoft from a legacy giant into the world\u2019s leading AI-cloud company.", photo:"photos/satya-nadella.jpg", founded:1975 },
+    { id:"sundar-pichai", name:"Sundar Pichai", role:"CEO", company:"Alphabet / Google", ticker:"GOOG", sector:"Search / AI / Cloud", location:"Mountain View, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$1.5B", bio:"Runs Google, YouTube, Waymo, and DeepMind. The quiet architect of AI at scale.", photo:"photos/sundar-pichai.jpg", founded:1998 },
+    { id:"lisa-su", name:"Lisa Su", role:"CEO", company:"AMD", ticker:"AMD", sector:"Semiconductors", location:"Santa Clara, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$1.2B", bio:"Took AMD from near-bankruptcy to a $200B chip powerhouse challenging NVIDIA and Intel.", photo:"photos/lisa-su.jpg", founded:1969 },
+    { id:"bernard-arnault", name:"Bernard Arnault", role:"Chairman & CEO", company:"LVMH", ticker:"MC.PA", sector:"Luxury", location:"Paris, France", country:"\u{1F1EB}\u{1F1F7}", netWorth:"$175B", bio:"Built the world\u2019s largest luxury empire. Louis Vuitton, Dior, Mo\u00ebt, Hennessy, Tiffany.", photo:"photos/bernard-arnault.jpg", founded:1987 },
+    { id:"jamie-dimon", name:"Jamie Dimon", role:"Chairman & CEO", company:"JPMorgan Chase", ticker:"JPM", sector:"Banking / Finance", location:"New York, NY", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$2.3B", bio:"Wall Street\u2019s most powerful banker. Survived every crisis. Still running the show.", photo:"photos/jamie-dimon.jpg", founded:2000 },
+    { id:"reed-hastings", name:"Reed Hastings", role:"Co-Founder & Executive Chairman", company:"Netflix", ticker:"NFLX", sector:"Streaming / Entertainment", location:"Los Gatos, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$6.5B", bio:"Killed Blockbuster. Built the streaming era. Now letting the next generation run it.", photo:"photos/reed-hastings.jpg", founded:1997 },
+    { id:"brian-chesky", name:"Brian Chesky", role:"CEO & Co-Founder", company:"Airbnb", ticker:"ABNB", sector:"Travel / Marketplace", location:"San Francisco, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$11B", bio:"Turned air mattresses into a $80B travel empire. Design-obsessed operator.", photo:"photos/brian-chesky.jpg", founded:2008 },
+    { id:"brian-armstrong", name:"Brian Armstrong", role:"CEO & Co-Founder", company:"Coinbase", ticker:"COIN", sector:"Crypto / Fintech", location:"San Francisco, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$11B", bio:"Built the bridge between Wall Street and crypto. The most legit exchange in the game.", photo:"photos/brian-armstrong.jpg", founded:2012 },
+    { id:"dara-khosrowshahi", name:"Dara Khosrowshahi", role:"CEO", company:"Uber", ticker:"UBER", sector:"Mobility / Delivery", location:"San Francisco, CA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$350M", bio:"Cleaned up Uber\u2019s mess and turned it profitable. The turnaround CEO.", photo:"photos/dara-khosrowshahi.jpg", founded:2009 },
+    { id:"andy-jassy", name:"Andy Jassy", role:"CEO", company:"Amazon", ticker:"AMZN", sector:"E-commerce / Cloud", location:"Seattle, WA", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$700M", bio:"Built AWS from scratch. Now running the everything-store after Bezos stepped back.", photo:"photos/andy-jassy.jpg", founded:1994 },
+    { id:"patrick-collison", name:"Patrick Collison", role:"CEO & Co-Founder", company:"Stripe", ticker:null, sector:"Fintech / Payments", location:"San Francisco, CA", country:"\u{1F1EE}\u{1F1EA}", netWorth:"$12.7B", bio:"Irish brothers who built the payments infrastructure for the internet. Seven lines of code.", photo:"photos/patrick-collison.jpg", founded:2010 },
+    { id:"masayoshi-son", name:"Masayoshi Son", role:"Chairman & CEO", company:"SoftBank", ticker:"9984.T", sector:"Investment / Tech", location:"Tokyo, Japan", country:"\u{1F1EF}\u{1F1F5}", netWorth:"$25B", bio:"The biggest bet-maker in tech history. Vision Fund changed venture capital forever.", photo:"photos/masayoshi-son.jpg", founded:1981 },
+    { id:"changpeng-zhao", name:"Changpeng Zhao", role:"Founder", company:"Binance", ticker:null, sector:"Crypto / Exchange", location:"Dubai, UAE", country:"\u{1F1E8}\u{1F1F3}", netWorth:"$33B", bio:"Built the world\u2019s largest crypto exchange in under a year. Survived regulators, jail time, and FUD.", photo:"photos/changpeng-zhao.jpg", founded:2017 },
+    { id:"whitney-wolfe-herd", name:"Whitney Wolfe Herd", role:"Founder & Executive Chairman", company:"Bumble", ticker:"BMBL", sector:"Dating / Social", location:"Austin, TX", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$740M", bio:"Created the dating app where women make the first move. Youngest female CEO to IPO.", photo:"photos/whitney-wolfe-herd.jpg", founded:2014 },
+    { id:"daniel-ek", name:"Daniel Ek", role:"CEO & Co-Founder", company:"Spotify", ticker:"SPOT", sector:"Music / Audio", location:"Stockholm, Sweden", country:"\u{1F1F8}\u{1F1EA}", netWorth:"$7B", bio:"Saved the music industry from piracy by making streaming work. 600M+ users.", photo:"photos/daniel-ek.jpg", founded:2006 },
+    { id:"sebastian-siemiatkowski", name:"Sebastian Siemiatkowski", role:"CEO & Co-Founder", company:"Klarna", ticker:null, sector:"Fintech / BNPL", location:"Stockholm, Sweden", country:"\u{1F1F8}\u{1F1EA}", netWorth:"$2.5B", bio:"Built Europe\u2019s most valuable fintech. Buy now, pay later went from niche to norm.", photo:"photos/sebastian-siemiatkowski.jpg", founded:2005 },
+    { id:"pieter-van-der-does", name:"Pieter van der Does", role:"CEO & Co-Founder", company:"Adyen", ticker:"ADYEN.AS", sector:"Fintech / Payments", location:"Amsterdam, Netherlands", country:"\u{1F1F3}\u{1F1F1}", netWorth:"$3B", bio:"Built the payments platform behind Netflix, Uber, and Spotify. Amsterdam\u2019s quiet giant.", photo:"photos/pieter-van-der-does.jpg", founded:2006 },
+    { id:"jitse-groen", name:"Jitse Groen", role:"CEO & Founder", company:"Just Eat Takeaway", ticker:"TKWY.AS", sector:"Food Delivery", location:"Amsterdam, Netherlands", country:"\u{1F1F3}\u{1F1F1}", netWorth:"$1.5B", bio:"Built Thuisbezorgd from his dorm room into Europe\u2019s largest food delivery platform.", photo:"photos/jitse-groen.jpg", founded:2000 },
+    { id:"taavet-hinrikus", name:"Taavet Hinrikus", role:"Co-Founder", company:"Wise", ticker:"WISE.L", sector:"Fintech / Transfers", location:"London, UK", country:"\u{1F1EA}\u{1F1EA}", netWorth:"$1B", bio:"Skype\u2019s first employee turned fintech founder. Made international money transfers honest.", photo:"photos/taavet-hinrikus.jpg", founded:2011 },
+    { id:"nikolay-storonsky", name:"Nikolay Storonsky", role:"CEO & Founder", company:"Revolut", ticker:null, sector:"Fintech / Neobank", location:"London, UK", country:"\u{1F1F7}\u{1F1FA}", netWorth:"$7B", bio:"Built Europe\u2019s most aggressive neobank. 40M+ customers. Banking license in hand.", photo:"photos/nikolay-storonsky.jpg", founded:2015 },
+    { id:"anne-boden", name:"Anne Boden", role:"Founder", company:"Starling Bank", ticker:null, sector:"Fintech / Neobank", location:"London, UK", country:"\u{1F1EC}\u{1F1E7}", netWorth:"$400M", bio:"Left a 30-year banking career to build the UK\u2019s best digital bank. Profitable from day one.", photo:"photos/anne-boden.jpg", founded:2014 },
+    { id:"steven-bartlett", name:"Steven Bartlett", role:"Founder & Host", company:"Diary of a CEO / Flight Story", ticker:null, sector:"Media / Venture", location:"London, UK", country:"\u{1F1EC}\u{1F1E7}", netWorth:"$120M", bio:"University dropout turned Europe\u2019s biggest podcaster and youngest Dragon\u2019s Den investor.", photo:"photos/steven-bartlett.jpg", founded:2017 },
+    { id:"alex-chesterman", name:"Alex Chesterman", role:"Serial Founder", company:"Zoopla / Cazoo / LoveFilm", ticker:null, sector:"Marketplaces", location:"London, UK", country:"\u{1F1EC}\u{1F1E7}", netWorth:"$300M", bio:"Three billion-dollar companies. LoveFilm sold to Amazon. Zoopla to Silver Lake. Serial builder.", photo:"photos/alex-chesterman.jpg", founded:2007 },
+    { id:"ida-tin", name:"Ida Tin", role:"Founder", company:"Clue", ticker:null, sector:"FemTech / Health", location:"Berlin, Germany", country:"\u{1F1E9}\u{1F1F0}", netWorth:"Private", bio:"Coined the term \u2018FemTech\u2019. Built the most trusted period-tracking app in the world.", photo:"photos/ida-tin.jpg", founded:2012 },
+    { id:"henrik-henriksson", name:"Henrik Henriksson", role:"CEO", company:"H2 Green Steel", ticker:null, sector:"Green Industry / Steel", location:"Stockholm, Sweden", country:"\u{1F1F8}\u{1F1EA}", netWorth:"Private", bio:"Left Scania to decarbonize steel. Building the world\u2019s first fossil-free steel plant.", photo:"photos/henrik-henriksson.jpg", founded:2020 },
+    { id:"bas-lansdorp", name:"Bas Lansdorp", role:"Founder", company:"Mars One", ticker:null, sector:"Space / Deeptech", location:"Amsterdam, Netherlands", country:"\u{1F1F3}\u{1F1F1}", netWorth:"Private", bio:"Tried to colonize Mars with a one-way ticket. The most audacious startup pitch ever made.", photo:"photos/bas-lansdorp.jpg", founded:2012 },
+    { id:"mathias-dopfner", name:"Mathias D\u00f6pfner", role:"CEO", company:"Axel Springer", ticker:null, sector:"Media / Publishing", location:"Berlin, Germany", country:"\u{1F1E9}\u{1F1EA}", netWorth:"$3B", bio:"Transformed a newspaper empire into a digital media powerhouse. Owns Politico and Business Insider.", photo:"photos/mathias-dopfner.jpg", founded:1946 },
+    { id:"mikael-hed", name:"Mikael Hed", role:"Former CEO", company:"Rovio (Angry Birds)", ticker:null, sector:"Gaming / Entertainment", location:"Helsinki, Finland", country:"\u{1F1EB}\u{1F1EE}", netWorth:"$400M", bio:"Turned a mobile game into a global franchise worth billions. Movies, merch, theme parks.", photo:"photos/mikael-hed.jpg", founded:2003 },
+    { id:"nikolaj-nyholm", name:"Nikolaj Nyholm", role:"Founder & CEO", company:"CEGO", ticker:null, sector:"Gaming / iGaming", location:"Copenhagen, Denmark", country:"\u{1F1E9}\u{1F1F0}", netWorth:"Private", bio:"Built Denmark\u2019s leading gaming company. Quiet operator in a loud industry.", photo:"photos/nikolaj-nyholm.jpg", founded:2006 },
+    { id:"will-shu", name:"Will Shu", role:"CEO & Co-Founder", company:"Deliveroo", ticker:"ROO.L", sector:"Food Delivery", location:"London, UK", country:"\u{1F1FA}\u{1F1F8}", netWorth:"$800M", bio:"American in London who built a food delivery giant. Survived Amazon\u2019s entry and COVID chaos.", photo:"photos/will-shu.jpg", founded:2013 },
+    { id:"pernille-blume", name:"Pernille Blume", role:"Olympic Champion", company:"Independent Athlete", ticker:null, sector:"Sports / Performance", location:"Copenhagen, Denmark", country:"\u{1F1E9}\u{1F1F0}", netWorth:"Private", bio:"Olympic gold medalist in swimming. Rising star pick \u2014 peak human performance.", photo:"photos/pernille-blume.jpg", founded:null }
+  ];
+
+  let roster = [];
+  let currentChar = 0;
+  let currentUser = null;
+  let team = [];
+  let teamDbId = null;
+  let userLeagues = [];
+  let currentLeagueId = null;
+  let pendingJoinCode = null;
+
+  // ============================================================
+  // LOAD DATA
+  // ============================================================
+  async function init() {
+    // Seed random consistently per session so scores don't jump on every reload
+    const seed = sessionStorage.getItem('backed_seed') || String(Math.random());
+    sessionStorage.setItem('backed_seed', seed);
+    let seedVal = Array.from(seed).reduce((a, c) => a + c.charCodeAt(0), 0);
+    const seededRandom = () => { seedVal = (seedVal * 9301 + 49297) % 233280; return seedVal / 233280; };
+
+    roster = ROSTER_RAW.map(person => ({
+      ...person,
+      backedScore: generateMockScore(person, seededRandom),
+      mockTrend: generateMockTrend(seededRandom),
+      mockDrafters: Math.floor(seededRandom() * 400) + 50
+    }));
+
+    roster.sort((a, b) => b.backedScore - a.backedScore);
+
+    buildRoster();
+    renderCharacter(0);
+    buildDraftGrid();
+    buildLeaderboard();
+    buildHeroEvents();
+
+    // Load live scores from Supabase (overwrites mocks if available)
+    await loadLiveScores();
+
+    // Init auth
+    await initAuth();
+
+    // Check for join code in URL
+    const params = new URLSearchParams(window.location.search);
+    const joinCode = params.get('join');
+    if (joinCode) {
+      if (!currentUser) {
+        pendingJoinCode = joinCode;
+        openAuthModal();
+      } else {
+        await handleJoinLeagueByCode(joinCode);
+      }
+    }
+  }
+
+  function generateMockScore(person, rng) {
+    const base = person.ticker ? 65 : 50;
+    const variance = rng() * 30;
+    return Math.round((base + variance) * 10) / 10;
+  }
+
+  function generateMockTrend(rng) {
+    const val = (rng() * 24 - 6);
+    return Math.round(val * 10) / 10;
+  }
+
+  // Load real scores from Supabase (replaces mock data when available)
+  async function loadLiveScores() {
+    if (!sb) return;
+    try {
+      const { data } = await sb.from('scores_cache').select('*');
+      if (!data || data.length === 0) return;
+
+      let updated = 0;
+      data.forEach(score => {
+        const person = roster.find(p => p.id === score.person_id);
+        if (person) {
+          person.backedScore = score.backed_score;
+          person.mockTrend = score.stock_change_pct || person.mockTrend;
+          person.mockDrafters = score.total_drafters || person.mockDrafters;
+          person.stockPrice = score.stock_price;
+          person.sentimentScore = score.sentiment_score;
+          person.liveData = true;
+          updated++;
+        }
+      });
+
+      if (updated > 0) {
+        console.log(`Loaded live scores for ${updated} people`);
+        roster.sort((a, b) => b.backedScore - a.backedScore);
+        buildDraftGrid();
+        buildLeaderboard();
+        if (roster.length > 0) renderCharacter(currentChar);
+      }
+    } catch (e) {
+      console.warn('Could not load live scores:', e.message);
+    }
+  }
+
+  // ============================================================
+  // AUTH
+  // ============================================================
+  async function initAuth() {
+    if (!sb) { loadLocalTeam(); updateDraftUI(); return; }
+
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      updateAuthUI();
+      await loadUserTeam();
+      await loadUserLeagues();
+    } else {
+      loadLocalTeam();
+    }
+    updateDraftUI();
+
+    sb.auth.onAuthStateChange(async (event, session) => {
+      currentUser = session?.user || null;
+      updateAuthUI();
+      if (event === 'SIGNED_IN') {
+        closeAuthModal();
+        await loadUserTeam();
+        await loadUserLeagues();
+        updateDraftUI();
+        if (pendingJoinCode) {
+          await handleJoinLeagueByCode(pendingJoinCode);
+          pendingJoinCode = null;
+        }
+      }
+      if (event === 'SIGNED_OUT') {
+        team = [];
+        teamDbId = null;
+        userLeagues = [];
+        updateDraftUI();
+        renderLeagues();
+      }
+    });
+  }
+
+  function getDisplayName() {
+    if (!currentUser) return 'Player';
+    return currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0] || 'Player';
+  }
+
+  function updateAuthUI() {
+    const authEl = document.getElementById('navAuth');
+    if (currentUser) {
+      const name = getDisplayName();
+      authEl.innerHTML = `
+        <span class="nav-user">${name}</span>
+        <button class="nav-signout" onclick="handleSignOut()">Sign Out</button>
+      `;
+    } else {
+      authEl.innerHTML = '<button class="btn-signin" onclick="openAuthModal()">Sign In</button>';
+    }
+  }
+
+  function openAuthModal() {
+    switchAuthTab('login');
+    document.getElementById('authSuccess').style.display = 'none';
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('signupUsername').value = '';
+    document.getElementById('signupEmail').value = '';
+    document.getElementById('signupPassword').value = '';
+    document.getElementById('signupError').textContent = '';
+    document.getElementById('authModal').classList.add('open');
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authModal').classList.remove('open');
+  }
+
+  function switchAuthTab(tab) {
+    const loginTab = document.getElementById('tabLogin');
+    const signupTab = document.getElementById('tabSignup');
+    const loginForm = document.getElementById('authLogin');
+    const signupForm = document.getElementById('authSignup');
+    document.getElementById('authSuccess').style.display = 'none';
+
+    if (tab === 'login') {
+      loginTab.style.color = 'var(--accent)';
+      loginTab.style.borderBottomColor = 'var(--accent)';
+      signupTab.style.color = 'var(--text-label)';
+      signupTab.style.borderBottomColor = 'transparent';
+      loginForm.style.display = '';
+      signupForm.style.display = 'none';
+    } else {
+      signupTab.style.color = 'var(--accent)';
+      signupTab.style.borderBottomColor = 'var(--accent)';
+      loginTab.style.color = 'var(--text-label)';
+      loginTab.style.borderBottomColor = 'transparent';
+      signupForm.style.display = '';
+      loginForm.style.display = 'none';
+    }
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    document.getElementById('loginError').textContent = '';
+
+    if (!email || !password) {
+      document.getElementById('loginError').textContent = 'Enter email and password';
+      return;
+    }
+
+    const btn = document.getElementById('loginSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+
+    if (!sb) {
+      // Offline mode
+      currentUser = { id: 'local', email, user_metadata: { display_name: email.split('@')[0] } };
+      updateAuthUI();
+      closeAuthModal();
+      loadLocalTeam();
+      updateDraftUI();
+      btn.disabled = false;
+      btn.textContent = 'Log In';
+      return;
+    }
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    btn.disabled = false;
+    btn.textContent = 'Log In';
+
+    if (error) {
+      document.getElementById('loginError').textContent = error.message;
+    } else if (data.user) {
+      currentUser = data.user;
+      updateAuthUI();
+      closeAuthModal();
+      await loadUserTeam();
+      await loadUserLeagues();
+      updateDraftUI();
+    }
+  }
+
+  async function handleSignup() {
+    const username = document.getElementById('signupUsername').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    document.getElementById('signupError').textContent = '';
+
+    if (!username) { document.getElementById('signupError').textContent = 'Choose a username'; return; }
+    if (username.length < 3) { document.getElementById('signupError').textContent = 'Username must be at least 3 characters'; return; }
+    if (!email) { document.getElementById('signupError').textContent = 'Enter your email'; return; }
+    if (password.length < 6) { document.getElementById('signupError').textContent = 'Password must be at least 6 characters'; return; }
+
+    if (!sb) {
+      currentUser = { id: 'local', email, user_metadata: { display_name: username } };
+      updateAuthUI();
+      closeAuthModal();
+      loadLocalTeam();
+      updateDraftUI();
+      return;
+    }
+
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { display_name: username }
+      }
+    });
+
+    if (error) {
+      document.getElementById('signupError').textContent = error.message;
+    } else if (data.user) {
+      // Set current user immediately (don't wait for auth state change)
+      currentUser = data.user;
+      updateAuthUI();
+
+      // Show success then auto-close
+      document.getElementById('authLogin').style.display = 'none';
+      document.getElementById('authSignup').style.display = 'none';
+      document.getElementById('authTabs').style.display = 'none';
+      document.getElementById('authSuccess').style.display = '';
+
+      // Load user data
+      await loadUserTeam();
+      await loadUserLeagues();
+      updateDraftUI();
+
+      setTimeout(() => {
+        closeAuthModal();
+        navigateTo('people');
+      }, 1200);
+    }
+  }
+
+  async function handleSignOut() {
+    if (sb) await sb.auth.signOut();
+    currentUser = null;
+    team = [];
+    teamDbId = null;
+    userLeagues = [];
+    updateAuthUI();
+    updateDraftUI();
+    renderLeagues();
+    navigateTo('home');
+  }
+
+  // ============================================================
+  // TEAM — DB-BACKED
+  // ============================================================
+  function loadLocalTeam() {
+    team = JSON.parse(localStorage.getItem('backed_team') || '[]');
+  }
+
+  async function loadUserTeam() {
+    if (!sb || !currentUser || currentUser.id === 'local') { loadLocalTeam(); return; }
+
+    const { data } = await sb
+      .from('teams')
+      .select('id, team_members(person_id, tokens_allocated)')
+      .eq('user_id', currentUser.id)
+      .eq('season', '2026-Q2')
+      .is('league_id', null)
+      .maybeSingle();
+
+    if (data) {
+      teamDbId = data.id;
+      team = (data.team_members || []).map(m => ({ id: m.person_id, tokens: m.tokens_allocated }));
+    } else {
+      team = [];
+      teamDbId = null;
+    }
+  }
+
+  async function saveTeam() {
+    // Always save locally as fallback
+    localStorage.setItem('backed_team', JSON.stringify(team));
+
+    if (!sb || !currentUser || currentUser.id === 'local') return;
+
+    if (!teamDbId) {
+      const { data } = await sb
+        .from('teams')
+        .insert({ user_id: currentUser.id, season: '2026-Q2' })
+        .select('id')
+        .single();
+      if (data) teamDbId = data.id;
+    }
+
+    if (!teamDbId) return;
+
+    await sb.from('team_members').delete().eq('team_id', teamDbId);
+    if (team.length > 0) {
+      await sb.from('team_members').insert(
+        team.map(t => ({ team_id: teamDbId, person_id: t.id, tokens_allocated: t.tokens }))
+      );
+    }
+  }
+
+  // ============================================================
+  // LEAGUES
+  // ============================================================
+  async function loadUserLeagues() {
+    if (!sb || !currentUser || currentUser.id === 'local') { userLeagues = []; renderLeagues(); return; }
+
+    const { data: memberships } = await sb
+      .from('league_members')
+      .select('league_id, leagues(id, name, invite_code, season, created_at)')
+      .eq('user_id', currentUser.id);
+
+    userLeagues = (memberships || []).map(m => m.leagues).filter(Boolean);
+    renderLeagues();
+  }
+
+  function renderLeagues() {
+    const el = document.getElementById('leaguesList');
+    if (!el) return;
+
+    if (userLeagues.length === 0) {
+      el.innerHTML = '<div class="leagues-empty">No leagues yet. Create one or join with a code.</div>';
+      return;
+    }
+
+    el.innerHTML = userLeagues.map(league => `
+      <div class="league-card" onclick="viewLeague('${league.id}')">
+        <div class="league-card-name">${league.name}</div>
+        <div class="league-card-meta">Season: ${league.season}</div>
+        <div class="league-card-invite" onclick="event.stopPropagation(); copyInvite('${league.invite_code}')">
+          Code: ${league.invite_code.toUpperCase()} &middot; Copy invite link
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function handleCreateLeague() {
+    const name = document.getElementById('leagueName').value.trim();
+    if (!name) { document.getElementById('createLeagueError').textContent = 'Enter a name'; return; }
+    if (!sb || !currentUser || currentUser.id === 'local') {
+      document.getElementById('createLeagueError').textContent = 'Sign in first';
+      return;
+    }
+
+    const { data, error } = await sb
+      .from('leagues')
+      .insert({ name, created_by: currentUser.id })
+      .select('id, invite_code')
+      .single();
+
+    if (error) { document.getElementById('createLeagueError').textContent = error.message; return; }
+
+    // Auto-join as member
+    await sb.from('league_members').insert({ league_id: data.id, user_id: currentUser.id });
+
+    // Auto-create team for this league
+    await sb.from('teams').insert({ user_id: currentUser.id, league_id: data.id, season: '2026-Q2' });
+
+    closeModal('createLeagueModal');
+    document.getElementById('leagueName').value = '';
+    await loadUserLeagues();
+  }
+
+  async function handleJoinLeague() {
+    const code = document.getElementById('joinCode').value.trim();
+    if (!code) return;
+    await handleJoinLeagueByCode(code);
+    document.getElementById('joinCode').value = '';
+  }
+
+  async function handleJoinLeagueByCode(code) {
+    if (!sb || !currentUser || currentUser.id === 'local') {
+      openAuthModal();
+      pendingJoinCode = code;
+      return;
+    }
+
+    const { data: league } = await sb
+      .from('leagues')
+      .select('id, name')
+      .eq('invite_code', code.toLowerCase())
+      .maybeSingle();
+
+    if (!league) {
+      // Try uppercase
+      const { data: league2 } = await sb
+        .from('leagues')
+        .select('id, name')
+        .eq('invite_code', code.toUpperCase())
+        .maybeSingle();
+
+      if (!league2) { alert('Invalid invite code'); return; }
+      await joinLeagueById(league2);
+      return;
+    }
+    await joinLeagueById(league);
+  }
+
+  async function joinLeagueById(league) {
+    // Check if already a member
+    const { data: existing } = await sb
+      .from('league_members')
+      .select('id')
+      .eq('league_id', league.id)
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+
+    if (existing) {
+      navigateTo('leagues');
+      return;
+    }
+
+    await sb.from('league_members').insert({ league_id: league.id, user_id: currentUser.id });
+    await sb.from('teams').insert({ user_id: currentUser.id, league_id: league.id, season: '2026-Q2' });
+    await loadUserLeagues();
+    navigateTo('leagues');
+  }
+
+  function copyInvite(code) {
+    const url = `${window.location.origin}${window.location.pathname}?join=${code}`;
+    navigator.clipboard.writeText(url).then(() => {
+      // Brief visual feedback
+      const el = event.target;
+      const orig = el.textContent;
+      el.textContent = 'Copied!';
+      setTimeout(() => { el.innerHTML = `Code: ${code.toUpperCase()} &middot; Copy invite link`; }, 1500);
+    });
+  }
+
+  function viewLeague(leagueId) {
+    // For now, navigate to leaderboard filtered by league
+    currentLeagueId = leagueId;
+    navigateTo('leaderboard');
+    // TODO: load league-specific leaderboard
+  }
+
+  // ============================================================
+  // ROSTER SIDEBAR
+  // ============================================================
+  function buildRoster() {
+    const list = document.getElementById('rosterList');
+    const countEl = document.getElementById('rosterCount');
+    countEl.textContent = `${roster.length} leaders`;
+
+    roster.forEach((person, i) => {
+      const item = document.createElement('div');
+      item.className = 'roster-item' + (i === 0 ? ' active' : '');
+      item.dataset.person = i;
+      item.innerHTML = `<span class="roster-name">${person.name}</span><span class="roster-tag">${person.sector}</span>`;
+      item.addEventListener('click', () => renderCharacter(i));
+      list.appendChild(item);
+    });
+
+    // Search
+    document.getElementById('rosterSearch').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('.roster-item[data-person]').forEach(item => {
+        const idx = parseInt(item.dataset.person);
+        const person = roster[idx];
+        const match = person.name.toLowerCase().includes(q) ||
+                      person.company.toLowerCase().includes(q) ||
+                      person.sector.toLowerCase().includes(q);
+        item.style.display = match ? '' : 'none';
+      });
+    });
+  }
+
+  // ============================================================
+  // CHARACTER SELECT
+  // ============================================================
+  function renderCharacter(index) {
+    const c = roster[index];
+    currentChar = index;
+
+    const img = document.getElementById('charImg');
+    img.src = c.photo;
+    img.alt = c.name;
+
+    const trendPositive = c.mockTrend >= 0;
+    const trendClass = trendPositive ? '' : 'negative';
+    const trendPrefix = trendPositive ? '+' : '';
+    const liveTag = c.liveData ? ' · LIVE' : '';
+    const priceStr = c.stockPrice ? `$${c.stockPrice.toLocaleString()}` : '';
+    const tickerDisplay = c.ticker
+      ? `<div class="stock-ticker-display ${trendClass}">${c.ticker} ${priceStr ? priceStr + ' ' : ''}${trendPrefix}${c.mockTrend}%${liveTag}</div>`
+      : (c.liveData ? `<div class="stock-ticker-display">Sentiment: ${c.sentimentScore > 0 ? '+' : ''}${c.sentimentScore}${liveTag}</div>` : '');
+
+    const panel = document.getElementById('charPanel');
+    panel.innerHTML = `
+      <div class="char-role">${c.role} · ${c.sector}</div>
+      <h2 class="char-name">${c.name}</h2>
+      <p class="char-bio">${c.bio}</p>
+      <div class="info-grid">
+        <div class="info-item"><span class="info-label">Company</span><span class="info-value">${c.company}</span></div>
+        <div class="info-item"><span class="info-label">Net Worth</span><span class="info-value">${c.netWorth}</span></div>
+        <div class="info-item"><span class="info-label">Location</span><span class="info-value">${c.location}</span></div>
+        <div class="info-item"><span class="info-label">Country</span><span class="info-value">${c.country}</span></div>
+        ${c.founded ? `<div class="info-item"><span class="info-label">Founded</span><span class="info-value">${c.founded}</span></div>` : ''}
+      </div>
+      ${tickerDisplay}
+      <div class="char-backing">
+        <div class="backing-number">
+          <span class="backing-count">${c.backedScore}</span>
+          <span class="backing-label">Backed Score</span>
+        </div>
+        <div class="trend-badge ${trendClass}">${trendPrefix}${c.mockTrend}% this season</div>
+        <div class="backing-number">
+          <span class="backing-count" style="font-size:1rem">${c.mockDrafters}</span>
+          <span class="backing-label">drafters</span>
+        </div>
+      </div>
+      <button class="btn-draft" onclick="draftFromRoster('${c.id}')">
+        ${team.find(t => t.id === c.id) ? '✓ Drafted' : `Draft ${c.name.split(' ')[0]} →`}
+      </button>
+    `;
+
+    // Animate
+    const wrapper = document.getElementById('charWrapper');
+    wrapper.style.animation = 'none';
+    panel.style.animation = 'none';
+    void wrapper.offsetHeight;
+    wrapper.style.animation = 'charIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards';
+    panel.style.animation = 'panelIn 0.6s cubic-bezier(0.4,0,0.2,1) 0.1s forwards';
+    panel.style.opacity = '0';
+    setTimeout(() => { panel.style.opacity = '1'; }, 100);
+
+    // Update roster active state
+    document.querySelectorAll('.roster-item[data-person]').forEach(item => {
+      item.classList.toggle('active', parseInt(item.dataset.person) === index);
+    });
+  }
+
+  function draftFromRoster(id) {
+    if (!currentUser) { openAuthModal(); return; }
+    const existing = team.find(t => t.id === id);
+    if (existing) {
+      team = team.filter(t => t.id !== id);
+    } else if (team.length < 5) {
+      team.push({ id, tokens: 10 });
+    }
+    saveTeam();
+    renderCharacter(currentChar);
+    updateDraftUI();
+    buildDraftGrid();
+  }
+
+  // Arrow navigation
+  document.getElementById('prevChar').addEventListener('click', () => {
+    renderCharacter((currentChar - 1 + roster.length) % roster.length);
+  });
+  document.getElementById('nextChar').addEventListener('click', () => {
+    renderCharacter((currentChar + 1) % roster.length);
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (!document.getElementById('page-people').classList.contains('active')) return;
+    if (document.activeElement.tagName === 'INPUT') return;
+    if (e.key === 'ArrowLeft') document.getElementById('prevChar').click();
+    if (e.key === 'ArrowRight') document.getElementById('nextChar').click();
+  });
+
+  // Parallax
+  const stageEl = document.querySelector('.stage');
+  if (stageEl) {
+    stageEl.addEventListener('mousemove', (e) => {
+      const wrapper = document.getElementById('charWrapper');
+      if (!wrapper) return;
+      const rect = stageEl.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      wrapper.style.transform = `rotateY(${x * 12}deg) rotateX(${-y * 8}deg)`;
+    });
+    stageEl.addEventListener('mouseleave', () => {
+      const wrapper = document.getElementById('charWrapper');
+      if (wrapper) wrapper.style.transform = 'rotateY(0deg) rotateX(0deg)';
+    });
+  }
+
+  // ============================================================
+  // DRAFT PAGE
+  // ============================================================
+  function buildDraftGrid() {
+    const grid = document.getElementById('draftGrid');
+    grid.innerHTML = '';
+
+    roster.forEach(person => {
+      const card = document.createElement('div');
+      card.className = 'draft-card' + (team.find(t => t.id === person.id) ? ' selected' : '');
+      card.dataset.id = person.id;
+      card.innerHTML = `
+        <img class="draft-card-img" src="${person.photo}" alt="${person.name}" loading="lazy">
+        <div class="draft-card-name">${person.name}</div>
+        <div class="draft-card-company">${person.company}</div>
+        <div class="draft-card-score">
+          <span class="draft-card-score-value">${person.backedScore}</span>
+          <span class="draft-card-sector">${person.sector}</span>
+        </div>
+      `;
+      card.addEventListener('click', () => toggleDraft(person.id));
+      grid.appendChild(card);
+    });
+  }
+
+  function toggleDraft(id) {
+    if (!currentUser) { openAuthModal(); return; }
+    const existing = team.find(t => t.id === id);
+    if (existing) {
+      team = team.filter(t => t.id !== id);
+    } else if (team.length < 5) {
+      team.push({ id, tokens: 10 });
+    }
+    saveTeam();
+    updateDraftUI();
+  }
+
+  function updateTokens(id, value) {
+    const member = team.find(t => t.id === id);
+    if (!member) return;
+    member.tokens = parseInt(value);
+
+    // Enforce max 100 total
+    const total = team.reduce((sum, t) => sum + t.tokens, 0);
+    if (total > 100) {
+      member.tokens -= (total - 100);
+      if (member.tokens < 1) member.tokens = 1;
+    }
+
+    saveTeam();
+    updateDraftUI();
+  }
+
+  function updateDraftUI() {
+    const tokensUsed = team.reduce((sum, t) => sum + t.tokens, 0);
+    const tokensLeft = 100 - tokensUsed;
+    const teamScore = team.reduce((sum, t) => {
+      const person = roster.find(p => p.id === t.id);
+      return sum + (person ? person.backedScore * (t.tokens / 100) : 0);
+    }, 0);
+
+    document.getElementById('tokensLeft').textContent = tokensLeft;
+    document.getElementById('teamCount').textContent = `${team.length} / 5`;
+    document.getElementById('teamScore').textContent = Math.round(teamScore * 10) / 10;
+
+    // Update draft grid selection
+    document.querySelectorAll('.draft-card').forEach(card => {
+      card.classList.toggle('selected', !!team.find(t => t.id === card.dataset.id));
+    });
+
+    // Update team list with token sliders
+    const listEl = document.getElementById('draftTeamList');
+    if (team.length === 0) {
+      listEl.innerHTML = currentUser
+        ? '<div class="draft-team-empty">No one drafted yet. Pick from the grid above.</div>'
+        : '<div class="draft-team-empty">Sign in to start drafting your team.</div>';
+    } else {
+      listEl.innerHTML = team.map(t => {
+        const person = roster.find(p => p.id === t.id);
+        if (!person) return '';
+        return `
+          <div class="draft-team-member">
+            <div class="draft-team-member-left">
+              <img class="draft-team-avatar" src="${person.photo}" alt="${person.name}">
+              <span class="draft-team-member-name">${person.name}</span>
+            </div>
+            <div class="token-slider-row">
+              <input type="range" class="token-slider" min="1" max="50" value="${t.tokens}"
+                     oninput="updateTokens('${t.id}', this.value)">
+              <span class="token-value">${t.tokens}</span>
+            </div>
+            <button class="draft-team-remove" onclick="event.stopPropagation(); toggleDraft('${t.id}')">Remove</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('draftTeamScore').textContent = `Score: ${Math.round(teamScore * 10) / 10}`;
+  }
+
+  function saveTeam() {
+    localStorage.setItem('backed_team', JSON.stringify(team));
+  }
+
+  // ============================================================
+  // LEADERBOARD
+  // ============================================================
+  function buildLeaderboard() {
+    const draftedEl = document.getElementById('leaderboardDrafted');
+    const scoreEl = document.getElementById('leaderboardScore');
+
+    // Show empty state until real players exist
+    draftedEl.innerHTML = '<div class="leagues-empty">No players ranked yet. Be the first to play.</div>';
+    scoreEl.innerHTML = '<div class="leagues-empty">Leaderboard populates after the first week of matches.</div>';
+  }
+
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+  function navigateTo(pageId) {
+    // Auth gate
+    const link = document.querySelector(`[data-page="${pageId}"]`);
+    if (link && link.dataset.auth === 'true' && !currentUser) {
+      openAuthModal();
+      return;
+    }
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pageEl = document.getElementById('page-' + pageId);
+    if (pageEl) pageEl.classList.add('active');
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page === pageId));
+    if (pageId === 'about') initRevealObserver();
+    if (pageId === 'draft') updateDraftUI();
+    if (pageId === 'match') renderMatch();
+    window.scrollTo(0, 0);
+  }
+
+  document.querySelectorAll('[data-page]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateTo(link.dataset.page);
+    });
+  });
+
+  // Reveal observer
+  function initRevealObserver() {
+    const reveals = document.querySelectorAll('#page-about .reveal');
+    if (!reveals.length) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => {
+      if (!el.classList.contains('visible')) observer.observe(el);
+    });
+  }
+
+  // Nav background on scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 40) {
+      nav.style.background = 'rgba(8,11,18,0.85)';
+      nav.style.backdropFilter = 'blur(24px)';
+      nav.style.webkitBackdropFilter = 'blur(24px)';
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.06)';
+    } else {
+      nav.style.background = 'transparent';
+      nav.style.backdropFilter = 'blur(0px)';
+      nav.style.webkitBackdropFilter = 'blur(0px)';
+      nav.style.borderBottomColor = 'transparent';
+    }
+  });
+
+  // ============================================================
+  // HERO LIVE EVENTS
+  // ============================================================
+  function buildHeroEvents() {
+    const el = document.getElementById('heroEventsList');
+    if (!el || roster.length === 0) return;
+
+    // Sort by absolute trend to find biggest movers
+    const movers = [...roster]
+      .filter(p => p.mockTrend !== 0)
+      .sort((a, b) => Math.abs(b.mockTrend) - Math.abs(a.mockTrend))
+      .slice(0, 5);
+
+    const events = movers.map(p => {
+      const positive = p.mockTrend >= 0;
+      const reasons = [];
+
+      if (p.ticker && positive) reasons.push(`${p.company} stock up this week`);
+      else if (p.ticker && !positive) reasons.push(`${p.company} stock down this week`);
+      else if (positive) reasons.push('Positive press momentum');
+      else reasons.push('Negative press coverage');
+
+      return `
+        <div class="live-event ${positive ? 'positive' : 'negative'}">
+          <span class="live-event-score ${positive ? 'up' : 'down'}">${positive ? '+' : ''}${p.mockTrend}%</span>
+          <span><span class="live-event-name">${p.name}</span> — ${reasons[0]}</span>
+        </div>
+      `;
+    }).join('');
+
+    el.innerHTML = events;
+  }
+
+  // ============================================================
+  // MATCH VISUALIZATION
+  // ============================================================
+  function renderMatch() {
+    if (team.length === 0) {
+      document.getElementById('matchVs').innerHTML = '<p style="color:var(--text-label)">Draft a team first to see your weekly fight.</p>';
+      document.getElementById('matchMatchups').innerHTML = '';
+      document.getElementById('matchTotal').innerHTML = '';
+      return;
+    }
+
+    // Generate a simulated opponent team from roster (people NOT in your team)
+    const available = roster.filter(p => !team.find(t => t.id === p.id));
+    const opponentPicks = [];
+    const shuffled = [...available].sort(() => 0.5 - Math.random());
+    for (let i = 0; i < Math.min(team.length, shuffled.length); i++) {
+      opponentPicks.push({ id: shuffled[i].id, tokens: team[i].tokens });
+    }
+
+    let yourTotal = 0;
+    let theirTotal = 0;
+
+    // Render individual matchups
+    const matchupsHtml = team.map((pick, i) => {
+      const yourPlayer = roster.find(p => p.id === pick.id);
+      const theirPick = opponentPicks[i];
+      if (!yourPlayer || !theirPick) return '';
+      const theirPlayer = roster.find(p => p.id === theirPick.id);
+      if (!theirPlayer) return '';
+
+      const yourPower = yourPlayer.backedScore * (pick.tokens / 100);
+      const theirPower = theirPlayer.backedScore * (theirPick.tokens / 100);
+      yourTotal += yourPower;
+      theirTotal += theirPower;
+
+      const total = yourPower + theirPower || 1;
+      const yourPct = Math.round((yourPower / total) * 100);
+      const theirPct = 100 - yourPct;
+
+      // Generate mock events based on score
+      const events = generateMatchEvents(yourPlayer, theirPlayer);
+
+      return `
+        <div class="matchup">
+          <div class="matchup-header">
+            <div class="matchup-player">
+              <img class="matchup-avatar" src="${yourPlayer.photo}" alt="${yourPlayer.name}">
+              <div>
+                <div class="matchup-name">${yourPlayer.name}</div>
+                <div class="matchup-company">${yourPlayer.company}</div>
+              </div>
+            </div>
+            <div class="matchup-vs">VS</div>
+            <div class="matchup-player right">
+              <img class="matchup-avatar" src="${theirPlayer.photo}" alt="${theirPlayer.name}">
+              <div>
+                <div class="matchup-name">${theirPlayer.name}</div>
+                <div class="matchup-company">${theirPlayer.company}</div>
+              </div>
+            </div>
+          </div>
+          <div class="momentum-bar-container">
+            <div class="momentum-bar-left" style="width:${yourPct}%"></div>
+            <div class="momentum-bar-right" style="width:${theirPct}%"></div>
+          </div>
+          <div class="matchup-scores">
+            <span class="matchup-score-left">${yourPower.toFixed(1)}</span>
+            <span class="matchup-score-right">${theirPower.toFixed(1)}</span>
+          </div>
+          <div class="matchup-events">${events}</div>
+        </div>
+      `;
+    }).join('');
+
+    // VS header
+    const yourName = currentUser ? (currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0] || 'You') : 'You';
+    const winning = yourTotal >= theirTotal;
+    document.getElementById('matchVs').innerHTML = `
+      <div style="text-align:center">
+        <div class="match-team-name">${yourName}</div>
+        <div class="match-team-score-big ${winning ? 'green' : 'red'}">${yourTotal.toFixed(1)}</div>
+      </div>
+      <div class="match-vs-label">VS</div>
+      <div style="text-align:center">
+        <div class="match-team-name">Opponent</div>
+        <div class="match-team-score-big ${!winning ? 'green' : 'red'}">${theirTotal.toFixed(1)}</div>
+      </div>
+    `;
+
+    document.getElementById('matchMatchups').innerHTML = matchupsHtml;
+
+    const diff = Math.abs(yourTotal - theirTotal).toFixed(1);
+    document.getElementById('matchTotal').innerHTML = winning
+      ? `<div class="match-result">You're winning by ${diff} points</div>`
+      : `<div class="match-result loss">You're losing by ${diff} points</div>`;
+  }
+
+  function generateMatchEvents(playerA, playerB) {
+    const events = [];
+
+    // Stock events
+    if (playerA.ticker && playerA.mockTrend) {
+      const dir = playerA.mockTrend >= 0 ? 'positive' : 'negative';
+      events.push(`<div class="matchup-event"><span class="matchup-event-dot ${dir}"></span>${playerA.ticker} ${playerA.mockTrend >= 0 ? '+' : ''}${playerA.mockTrend}% this week</div>`);
+    }
+    if (playerB.ticker && playerB.mockTrend) {
+      const dir = playerB.mockTrend >= 0 ? 'positive' : 'negative';
+      events.push(`<div class="matchup-event"><span class="matchup-event-dot ${dir}"></span>${playerB.ticker} ${playerB.mockTrend >= 0 ? '+' : ''}${playerB.mockTrend}% this week</div>`);
+    }
+
+    // Sentiment events
+    if (playerA.sentimentScore && playerA.sentimentScore !== 0) {
+      const dir = playerA.sentimentScore > 0 ? 'positive' : 'negative';
+      const label = playerA.sentimentScore > 0 ? 'Positive press momentum' : 'Negative press coverage';
+      events.push(`<div class="matchup-event"><span class="matchup-event-dot ${dir}"></span>${playerA.name}: ${label}</div>`);
+    }
+
+    // Community
+    if (playerA.mockDrafters > 200) {
+      events.push(`<div class="matchup-event"><span class="matchup-event-dot neutral"></span>${playerA.name}: High community conviction (${playerA.mockDrafters} drafters)</div>`);
+    }
+
+    return events.join('');
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  init();
+</script>
+</body>
+</html>
