@@ -1065,33 +1065,12 @@
   .join-btn:hover { transform: translateY(-1px); }
 
   /* Token slider in team */
-  .token-slider-row {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .token-slider {
-    flex: 1;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 4px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
-    outline: none;
-  }
-  .token-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-  }
-  .token-value {
+  .draft-team-score-badge {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 0.8rem;
-    color: var(--token-gold);
-    min-width: 24px;
+    font-size: 0.95rem;
+    color: var(--accent);
+    min-width: 48px;
     text-align: right;
   }
 
@@ -1342,7 +1321,7 @@
           <div class="about-card reveal delay-2">
             <div class="card-number">02</div>
             <h3 class="card-title">Draft your team</h3>
-            <p class="card-text">You have 100 tokens. Pick 5 people and decide how many of your 100 tokens to put behind each one. Put 40 tokens on Jensen Huang? His performance counts for 40% of your team's&nbsp;score.</p>
+            <p class="card-text">Pick 5 people you believe in. Your team score is the combined power of your fighters, updated in real&nbsp;time.</p>
           </div>
           <div class="about-card reveal delay-1">
             <div class="card-number">03</div>
@@ -1445,10 +1424,9 @@
     <div class="draft-header">
       <div class="section-label">Season 1 · Q2 2026</div>
       <h2 class="section-title">My&nbsp;Team</h2>
-      <p class="draft-sub">5 fighters. 100 tokens. Your&nbsp;call.</p>
+      <p class="draft-sub">Pick 5 fighters. Watch them&nbsp;fight.</p>
     </div>
     <div class="draft-stats" id="draftStats">
-      <div class="draft-stat"><div class="draft-stat-value gold" id="tokensLeft">100</div><div class="draft-stat-label">Tokens left</div></div>
       <div class="draft-stat"><div class="draft-stat-value" id="teamCount" style="color:var(--text)">0 / 5</div><div class="draft-stat-label">Drafted</div></div>
       <div class="draft-stat"><div class="draft-stat-value green" id="teamScore">0</div><div class="draft-stat-label">Team score</div></div>
     </div>
@@ -2174,11 +2152,11 @@
     if (team.length >= 5) return;
     const person = roster.find(p => p.id === id);
     document.getElementById('draftModalTitle').textContent = `Draft ${person.name}?`;
-    document.getElementById('draftModalText').textContent = `Costs 10 tokens from your 100-token budget. You can adjust anytime from My Team.`;
+    document.getElementById('draftModalText').textContent = `Adds ${person.name.split(' ')[0]} to your fighting team. You need 5 fighters to compete.`;
     const btn = document.getElementById('draftConfirmBtn');
-    btn.textContent = `Draft for 10 tokens`;
+    btn.textContent = `Draft ${person.name.split(' ')[0]}`;
     btn.onclick = () => {
-      team.push({ id, tokens: 10 });
+      team.push({ id, tokens: 20 });
       saveTeam();
       renderCharacter(currentChar);
       updateDraftUI();
@@ -2255,31 +2233,12 @@
     }
   }
 
-  function updateTokens(id, value) {
-    const member = team.find(t => t.id === id);
-    if (!member) return;
-    member.tokens = parseInt(value);
-
-    // Enforce max 100 total
-    const total = team.reduce((sum, t) => sum + t.tokens, 0);
-    if (total > 100) {
-      member.tokens -= (total - 100);
-      if (member.tokens < 1) member.tokens = 1;
-    }
-
-    saveTeam();
-    updateDraftUI();
-  }
-
   function updateDraftUI() {
-    const tokensUsed = team.reduce((sum, t) => sum + t.tokens, 0);
-    const tokensLeft = 100 - tokensUsed;
     const teamScore = team.reduce((sum, t) => {
       const person = roster.find(p => p.id === t.id);
-      return sum + (person ? person.backedScore * (t.tokens / 100) : 0);
+      return sum + (person ? person.backedScore * 0.2 : 0);
     }, 0);
 
-    document.getElementById('tokensLeft').textContent = tokensLeft;
     document.getElementById('teamCount').textContent = `${team.length} / 5`;
     document.getElementById('teamScore').textContent = Math.round(teamScore * 10) / 10;
 
@@ -2299,11 +2258,7 @@
               <img class="draft-team-avatar" src="${person.photo}" alt="${person.name}">
               <span class="draft-team-member-name">${person.name}</span>
             </div>
-            <div class="token-slider-row">
-              <input type="range" class="token-slider" min="1" max="50" value="${t.tokens}"
-                     oninput="updateTokens('${t.id}', this.value)">
-              <span class="token-value">${t.tokens}</span>
-            </div>
+            <div class="draft-team-score-badge">${person.backedScore}</div>
             <button class="draft-team-remove" onclick="event.stopPropagation(); removeFromTeam('${t.id}')">Remove</button>
           </div>
         `;
