@@ -1276,6 +1276,16 @@
   </div>
 </div>
 
+<!-- DRAFT CONFIRM -->
+<div class="modal-overlay" id="draftModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('draftModal')">&times;</button>
+    <h3 class="modal-title" id="draftModalTitle">Draft this player?</h3>
+    <p class="modal-text" id="draftModalText">Costs 10 tokens from your 100-token budget. You can adjust anytime from My&nbsp;Team.</p>
+    <button class="modal-btn" id="draftConfirmBtn">Draft for 10 tokens</button>
+  </div>
+</div>
+
 <!-- HOME -->
 <div class="page active" id="page-home">
   <div class="page-section">
@@ -1448,12 +1458,8 @@
         <div class="draft-team-score" id="draftTeamScore"></div>
       </div>
       <div class="draft-team-list" id="draftTeamList">
-        <div class="draft-team-empty">No one drafted yet. Browse the roster to add&nbsp;players.</div>
+        <div class="draft-team-empty">No one drafted yet. <a data-page="people" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Browse the roster</a> to add&nbsp;players.</div>
       </div>
-    </div>
-    <div style="margin-top:clamp(2rem,4vh,3rem);">
-      <div class="section-label" style="margin-bottom:1rem;">Add Players</div>
-      <div class="draft-grid" id="draftGrid"></div>
     </div>
   </div>
 </div>
@@ -1598,7 +1604,6 @@
 
     buildRoster();
     renderCharacter(0);
-    buildDraftGrid();
     buildLeaderboard();
     buildHeroEvents();
 
@@ -1656,7 +1661,6 @@
       if (updated > 0) {
         console.log(`Loaded live scores for ${updated} people`);
         roster.sort((a, b) => b.backedScore - a.backedScore);
-        buildDraftGrid();
         buildLeaderboard();
         if (roster.length > 0) renderCharacter(currentChar);
       }
@@ -2162,13 +2166,48 @@
     const existing = team.find(t => t.id === id);
     if (existing) {
       team = team.filter(t => t.id !== id);
-    } else if (team.length < 5) {
-      team.push({ id, tokens: 10 });
+      saveTeam();
+      renderCharacter(currentChar);
+      updateDraftUI();
+      return;
     }
-    saveTeam();
-    renderCharacter(currentChar);
-    updateDraftUI();
-    buildDraftGrid();
+    if (team.length >= 5) return;
+    const person = roster.find(p => p.id === id);
+    document.getElementById('draftModalTitle').textContent = `Draft ${person.name}?`;
+    document.getElementById('draftModalText').textContent = `Costs 10 tokens from your 100-token budget. You can adjust anytime from My Team.`;
+    const btn = document.getElementById('draftConfirmBtn');
+    btn.textContent = `Draft for 10 tokens`;
+    btn.onclick = () => {
+      team.push({ id, tokens: 10 });
+      saveTeam();
+      renderCharacter(currentChar);
+      updateDraftUI();
+      playCashSound();
+      closeModal('draftModal');
+    };
+    openModal('draftModal');
+  }
+
+  function playCashSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      const times = [0, 0.06, 0.13, 0.19];
+      const freqs = [1500, 2000, 2300, 1800];
+      times.forEach((t, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freqs[i], now + t);
+        osc.frequency.exponentialRampToValueAtTime(freqs[i] * 0.6, now + t + 0.1);
+        gain.gain.setValueAtTime(0.18, now + t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + t + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + t);
+        osc.stop(now + t + 0.22);
+      });
+    } catch (e) { /* audio not supported */ }
   }
 
   // Arrow navigation
@@ -2205,40 +2244,15 @@
   }
 
   // ============================================================
-  // DRAFT PAGE
+  // MY TEAM PAGE
   // ============================================================
-  function buildDraftGrid() {
-    const grid = document.getElementById('draftGrid');
-    grid.innerHTML = '';
-
-    roster.forEach(person => {
-      const card = document.createElement('div');
-      card.className = 'draft-card' + (team.find(t => t.id === person.id) ? ' selected' : '');
-      card.dataset.id = person.id;
-      card.innerHTML = `
-        <img class="draft-card-img" src="${person.photo}" alt="${person.name}" loading="lazy">
-        <div class="draft-card-name">${person.name}</div>
-        <div class="draft-card-company">${person.company}</div>
-        <div class="draft-card-score">
-          <span class="draft-card-score-value">${person.backedScore}</span>
-          <span class="draft-card-sector">${person.sector}</span>
-        </div>
-      `;
-      card.addEventListener('click', () => toggleDraft(person.id));
-      grid.appendChild(card);
-    });
-  }
-
-  function toggleDraft(id) {
-    if (!currentUser) { openAuthModal(); return; }
-    const existing = team.find(t => t.id === id);
-    if (existing) {
-      team = team.filter(t => t.id !== id);
-    } else if (team.length < 5) {
-      team.push({ id, tokens: 10 });
-    }
+  function removeFromTeam(id) {
+    team = team.filter(t => t.id !== id);
     saveTeam();
     updateDraftUI();
+    if (document.getElementById('page-people').classList.contains('active')) {
+      renderCharacter(currentChar);
+    }
   }
 
   function updateTokens(id, value) {
@@ -2269,16 +2283,11 @@
     document.getElementById('teamCount').textContent = `${team.length} / 5`;
     document.getElementById('teamScore').textContent = Math.round(teamScore * 10) / 10;
 
-    // Update draft grid selection
-    document.querySelectorAll('.draft-card').forEach(card => {
-      card.classList.toggle('selected', !!team.find(t => t.id === card.dataset.id));
-    });
-
     // Update team list with token sliders
     const listEl = document.getElementById('draftTeamList');
     if (team.length === 0) {
       listEl.innerHTML = currentUser
-        ? '<div class="draft-team-empty">No one drafted yet. Pick from the grid above.</div>'
+        ? '<div class="draft-team-empty">No one drafted yet. <a data-page="people" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Browse the roster</a> to add&nbsp;players.</div>'
         : '<div class="draft-team-empty">Sign in to start drafting your team.</div>';
     } else {
       listEl.innerHTML = team.map(t => {
@@ -2295,7 +2304,7 @@
                      oninput="updateTokens('${t.id}', this.value)">
               <span class="token-value">${t.tokens}</span>
             </div>
-            <button class="draft-team-remove" onclick="event.stopPropagation(); toggleDraft('${t.id}')">Remove</button>
+            <button class="draft-team-remove" onclick="event.stopPropagation(); removeFromTeam('${t.id}')">Remove</button>
           </div>
         `;
       }).join('');
