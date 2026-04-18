@@ -1771,7 +1771,13 @@
 
       if (updated > 0) {
         console.log(`Loaded live scores for ${updated} people`);
+        // Remember which person was active before re-sorting
+        const activeId = roster[currentChar]?.id;
         roster.sort((a, b) => b.backedScore - a.backedScore);
+        // Re-find index of the active person after sort
+        const newIdx = roster.findIndex(p => p.id === activeId);
+        currentChar = newIdx >= 0 ? newIdx : 0;
+        buildRoster();
         buildLeaderboard();
         if (roster.length > 0) renderCharacter(currentChar);
       }
@@ -2185,14 +2191,19 @@
   // ============================================================
   // ROSTER SIDEBAR
   // ============================================================
+  let rosterSearchBound = false;
+
   function buildRoster() {
     const list = document.getElementById('rosterList');
     const countEl = document.getElementById('rosterCount');
     countEl.textContent = `${roster.length} leaders`;
 
+    // Remove previously rendered roster items (keep search/title/count)
+    list.querySelectorAll('.roster-item[data-person]').forEach(el => el.remove());
+
     roster.forEach((person, i) => {
       const item = document.createElement('div');
-      item.className = 'roster-item roster-item-' + (person.category || 'blue-chip') + (i === 0 ? ' active' : '');
+      item.className = 'roster-item roster-item-' + (person.category || 'blue-chip') + (i === currentChar ? ' active' : '');
       item.dataset.person = i;
       const catLabel = getCategoryLabel(person.category);
       item.innerHTML = `<span class="roster-name">${person.name}</span><span class="roster-tag">${catLabel || person.sector}</span>`;
@@ -2200,18 +2211,21 @@
       list.appendChild(item);
     });
 
-    // Search
-    document.getElementById('rosterSearch').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('.roster-item[data-person]').forEach(item => {
-        const idx = parseInt(item.dataset.person);
-        const person = roster[idx];
-        const match = person.name.toLowerCase().includes(q) ||
-                      person.company.toLowerCase().includes(q) ||
-                      person.sector.toLowerCase().includes(q);
-        item.style.display = match ? '' : 'none';
+    // Search (bind only once)
+    if (!rosterSearchBound) {
+      document.getElementById('rosterSearch').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll('.roster-item[data-person]').forEach(item => {
+          const idx = parseInt(item.dataset.person);
+          const person = roster[idx];
+          const match = person.name.toLowerCase().includes(q) ||
+                        person.company.toLowerCase().includes(q) ||
+                        person.sector.toLowerCase().includes(q);
+          item.style.display = match ? '' : 'none';
+        });
       });
-    });
+      rosterSearchBound = true;
+    }
   }
 
   // ============================================================
