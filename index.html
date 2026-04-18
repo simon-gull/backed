@@ -1866,13 +1866,15 @@
   async function loadUserTeam() {
     if (!sb || !currentUser || currentUser.id === 'local') { loadLocalTeam(); return; }
 
-    const { data } = await sb
+    const { data, error } = await sb
       .from('teams')
       .select('id, team_members(person_id, tokens_allocated)')
       .eq('user_id', currentUser.id)
       .eq('season', '2026-Q2')
       .is('league_id', null)
       .maybeSingle();
+
+    console.log('[loadUserTeam]', { userId: currentUser.id, data, error });
 
     if (data) {
       teamDbId = data.id;
@@ -1890,21 +1892,25 @@
     if (!sb || !currentUser || currentUser.id === 'local') return;
 
     if (!teamDbId) {
-      const { data } = await sb
+      const { data, error } = await sb
         .from('teams')
         .insert({ user_id: currentUser.id, season: '2026-Q2' })
         .select('id')
         .single();
+      console.log('[saveTeam:insertTeam]', { data, error });
       if (data) teamDbId = data.id;
     }
 
-    if (!teamDbId) return;
+    if (!teamDbId) { console.warn('[saveTeam] no teamDbId, aborting'); return; }
 
-    await sb.from('team_members').delete().eq('team_id', teamDbId);
+    const { error: delError } = await sb.from('team_members').delete().eq('team_id', teamDbId);
+    if (delError) console.warn('[saveTeam:delete]', delError);
     if (team.length > 0) {
-      await sb.from('team_members').insert(
+      const { error: insError } = await sb.from('team_members').insert(
         team.map(t => ({ team_id: teamDbId, person_id: t.id, tokens_allocated: t.tokens }))
       );
+      if (insError) console.warn('[saveTeam:insert]', insError);
+      else console.log('[saveTeam] saved', team.length, 'members');
     }
   }
 
